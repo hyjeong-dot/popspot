@@ -27,7 +27,7 @@
 - [ ] packages/types (TypeScript 타입)
 - [ ] packages/utils (유틸리티)
 
----
+-----
 
 ### Week 2: 데이터베이스 & 인증
 
