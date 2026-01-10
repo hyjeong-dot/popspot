@@ -1,0 +1,9 @@
+/* @popspot/ui 기본 스타일 */
+/* 이 파일을 앱에서 import하여 기본 스타일 적용 */
+
+:root {
+    --color-primary: 139 92 246;
+    /* violet-500 */
+    --color-secondary: 99 102 241;
+    /* indigo-500 */
+}
