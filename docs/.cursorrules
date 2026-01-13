@@ -139,6 +139,7 @@ my-app/
 - location: { address, lat, lng, region }
 - period: { start, end }
 - hours, website, instagram
+- isReservationRequired, admissionFee, maxCapacityPerSlot
 - likes, commentCount, reportCount, status
 - createdBy, createdAt, updatedAt
 
@@ -146,7 +147,14 @@ my-app/
 - id, email, password, nickname, profileImage
 - role: 'user' | 'business' | 'admin'
 - businessInfo?: { businessNumber, companyName, verificationStatus }
-- favorites[], notifications
+- favorites[], isNotificationEnabled
+
+### Reservation (예약)
+- id, popupId, userId, date, time, count
+- totalAmount, status, paymentKey
+
+### Notification (알림)
+- id, userId, type, title, message, isRead
 
 ### Comment, Report, Notice, Inquiry
 - 각 모델의 상세 스펙은 docs/PROJECT_SPEC.md 참조
