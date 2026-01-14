@@ -1,0 +1,249 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.modal {
+    width: 100%;
+    max-width: 420px;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.header h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.closeBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: var(--gray-100);
+    border: none;
+    border-radius: 50%;
+    color: var(--gray-500);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.closeBtn:hover {
+    background: var(--gray-200);
+}
+
+.content {
+    padding: 1.5rem;
+}
+
+.subtitle {
+    color: var(--gray-600);
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+}
+
+.error {
+    padding: 0.75rem 1rem;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    color: #dc2626;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.typeList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.typeItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: var(--gray-50);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.typeItem:hover {
+    background: var(--primary-light);
+}
+
+.typeItem.selected {
+    background: var(--primary-light);
+    border-color: var(--primary-purple);
+}
+
+.typeItem input {
+    margin-top: 0.125rem;
+    accent-color: var(--primary-purple);
+}
+
+.typeContent {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.typeLabel {
+    font-weight: 600;
+    color: var(--gray-800);
+    font-size: 0.95rem;
+}
+
+.typeDesc {
+    color: var(--gray-500);
+    font-size: 0.85rem;
+}
+
+.textarea {
+    width: 100%;
+    min-height: 100px;
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 2px solid var(--gray-200);
+    border-radius: 12px;
+    font-size: 0.95rem;
+    resize: vertical;
+    transition: border-color 0.2s;
+}
+
+.textarea:focus {
+    outline: none;
+    border-color: var(--primary-purple);
+}
+
+.footer {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--gray-100);
+    background: var(--gray-50);
+}
+
+.cancelBtn {
+    flex: 1;
+    padding: 0.875rem;
+    background: white;
+    border: 2px solid var(--gray-200);
+    border-radius: 12px;
+    font-weight: 600;
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.cancelBtn:hover {
+    border-color: var(--gray-300);
+}
+
+.submitBtn {
+    flex: 1;
+    padding: 0.875rem;
+    background: #ef4444;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.submitBtn:hover:not(:disabled) {
+    background: #dc2626;
+}
+
+.submitBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Login Prompt */
+.loginPrompt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 3rem 2rem;
+    text-align: center;
+    color: var(--gray-500);
+}
+
+.loginBtn {
+    padding: 0.875rem 2rem;
+    background: var(--primary-gradient);
+    color: white;
+    border-radius: 12px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+/* Success */
+.success {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 3rem 2rem;
+    text-align: center;
+}
+
+.successIcon {
+    font-size: 3rem;
+}
+
+.success h3 {
+    font-size: 1.25rem;
+    color: var(--gray-900);
+}
+
+.success p {
+    color: var(--gray-500);
+}
+
+.confirmBtn {
+    margin-top: 1rem;
+    padding: 0.875rem 2rem;
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}

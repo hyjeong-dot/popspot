@@ -9,13 +9,23 @@
         "lint": "next lint"
     },
     "dependencies": {
+        "@dnd-kit/core": "^6.3.1",
+        "@dnd-kit/sortable": "^10.0.0",
+        "@dnd-kit/utilities": "^3.2.2",
         "@popspot/database": "workspace:*",
         "@popspot/types": "workspace:*",
         "@popspot/ui": "workspace:*",
         "@popspot/utils": "workspace:*",
+        "@supabase/ssr": "^0.8.0",
+        "@supabase/supabase-js": "^2.39.3",
+        "@types/react-datepicker": "^7.0.0",
+        "date-fns": "^3.3.0",
         "next": "14.1.0",
         "react": "^18.2.0",
-        "react-dom": "^18.2.0"
+        "react-datepicker": "^9.1.0",
+        "react-dom": "^18.2.0",
+        "react-icons": "^5.5.0",
+        "zustand": "^5.0.10"
     },
     "devDependencies": {
         "@types/node": "^20.11.0",

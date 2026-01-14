@@ -33,7 +33,7 @@ create type user_role as enum ('user', 'business', 'admin');
 create type verification_status as enum ('pending', 'approved', 'rejected');
 create type popup_status as enum ('active', 'ended', 'deleted');
 create type report_type as enum ('wrong_info', 'ended', 'duplicate', 'spam', 'other');
-create type process_status as enum ('pending', 'approved', 'rejected');
+create type process_status as enum ('pending', 'processed', 'ignored');
 create type inquiry_status as enum ('pending', 'answered');
 create type popup_category as enum ('fashion', 'beauty', 'character', 'food', 'lifestyle', 'art', 'entertainment', 'other');
 create type popup_region as enum ('서울/성수', '서울/홍대', '서울/강남', '서울/명동', '서울/여의도', '서울/기타', '경기', '부산', '기타');

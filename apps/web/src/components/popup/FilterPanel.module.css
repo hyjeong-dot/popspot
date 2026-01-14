@@ -1,0 +1,240 @@
+.panel {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-lg);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.closeBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: var(--gray-100);
+    border: none;
+    border-radius: 50%;
+    color: var(--gray-500);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.closeBtn:hover {
+    background: var(--gray-200);
+    color: var(--gray-700);
+}
+
+.content {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.filterGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.filterLabel {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    font-size: 0.95rem;
+}
+
+/* Category Grid */
+.categoryGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.5rem;
+}
+
+.categoryBtn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.75rem;
+    background: var(--gray-50);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.categoryBtn:hover {
+    background: var(--primary-light);
+    border-color: var(--primary-purple);
+}
+
+.categoryBtn.active {
+    background: var(--primary-light);
+    border-color: var(--primary-purple);
+    color: var(--primary-purple);
+}
+
+.categoryEmoji {
+    font-size: 1.5rem;
+}
+
+/* Region Grid */
+.regionGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.regionBtn {
+    padding: 0.5rem 1rem;
+    background: var(--gray-100);
+    border: 2px solid transparent;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.regionBtn:hover {
+    background: var(--primary-light);
+    border-color: var(--primary-purple);
+}
+
+.regionBtn.active {
+    background: var(--primary-purple);
+    border-color: var(--primary-purple);
+    color: white;
+}
+
+/* Date Inputs */
+.dateInputs {
+    display: flex;
+    align-items: end;
+    gap: 0.75rem;
+}
+
+.dateInput {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.dateInput label {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+}
+
+.dateInput input {
+    padding: 0.75rem;
+    border: 2px solid var(--gray-200);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    color: var(--gray-700);
+    background: var(--gray-50);
+    transition: all 0.2s;
+}
+
+.dateInput input:focus {
+    outline: none;
+    border-color: var(--primary-purple);
+    background: white;
+}
+
+.dateSeparator {
+    color: var(--gray-400);
+    padding-bottom: 0.75rem;
+}
+
+/* Footer */
+.footer {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--gray-100);
+    background: var(--gray-50);
+}
+
+.resetBtn {
+    flex: 1;
+    padding: 0.875rem;
+    background: white;
+    border: 2px solid var(--gray-200);
+    border-radius: 10px;
+    font-weight: 600;
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.resetBtn:hover {
+    border-color: var(--gray-400);
+}
+
+.applyBtn {
+    flex: 2;
+    padding: 0.875rem;
+    background: var(--primary-gradient);
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.applyBtn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .categoryGrid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .dateInputs {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .dateSeparator {
+        display: none;
+    }
+}
