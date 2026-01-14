@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PopSpot ER 다이어그램</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            color: #fff;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+        }
+
+        .legend {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 100;
+        }
+
+        .legend h3 {
+            color: #fff;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.85rem;
+        }
+
+        .legend-entity {
+            width: 30px;
+            height: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+        }
+
+        .legend-relationship {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            transform: rotate(45deg);
+        }
+
+        .legend-attribute {
+            width: 30px;
+            height: 18px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 50%;
+        }
+
+        .canvas-container {
+            width: 100%;
+            height: calc(100vh - 80px);
+            overflow: auto;
+            position: relative;
+        }
+
+        .er-canvas {
+            position: relative;
+            width: 3000px;
+            height: 2500px;
+            background-image: 
+                radial-gradient(circle at 1px 1px, rgba(255,255,255,0.1) 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+
+        /* Entity - Rectangle */
+        .entity {
+            position: absolute;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            padding: 15px 25px;
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
+            cursor: move;
+            user-select: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+            min-width: 120px;
+        }
+
+        .entity:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 50px rgba(102, 126, 234, 0.6);
+        }
+
+        .entity.dragging {
+            opacity: 0.8;
+            z-index: 1000;
+        }
+
+        /* Relationship - Diamond */
+        .relationship {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            cursor: move;
+            user-select: none;
+        }
+
+        .relationship-inner {
+            position: absolute;
+            width: 70%;
+            height: 70%;
+            top: 15%;
+            left: 15%;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            transform: rotate(45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 40px rgba(240, 147, 251, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .relationship:hover .relationship-inner {
+            box-shadow: 0 15px 50px rgba(240, 147, 251, 0.6);
+        }
+
+        .relationship-text {
+            transform: rotate(-45deg);
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.7rem;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .relationship.dragging {
+            opacity: 0.8;
+            z-index: 1000;
+        }
+
+        /* Attribute - Oval */
+        .attribute {
+            position: absolute;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 50%;
+            padding: 10px 18px;
+            color: #fff;
+            font-weight: 500;
+            font-size: 0.75rem;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(79, 172, 254, 0.4);
+            cursor: move;
+            user-select: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+            white-space: nowrap;
+        }
+
+        .attribute:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 40px rgba(79, 172, 254, 0.6);
+        }
+
+        .attribute.primary {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            text-decoration: underline;
+        }
+
+        .attribute.dragging {
+            opacity: 0.8;
+            z-index: 1000;
+        }
+
+        /* Connection Lines */
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        svg line {
+            stroke: rgba(255, 255, 255, 0.3);
+            stroke-width: 2;
+        }
+
+        .section-label {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Zoom Controls */
+        .zoom-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .zoom-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 1.2rem;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: background 0.3s;
+        }
+
+        .zoom-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 PopSpot ER 다이어그램</h1>
+        <p>행위 데이터 분석 기반 엔티티 관계도 | 드래그하여 이동 가능</p>
+    </div>
+
+    <div class="legend">
+        <h3>📌 범례</h3>
+        <div class="legend-item">
+            <div class="legend-entity"></div>
+            <span>행위자 (Entity)</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-relationship"></div>
+            <span>행위 (Relationship)</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-attribute"></div>
+            <span>속성 (Attribute)</span>
+        </div>
+    </div>
+
+    <div class="canvas-container">
+        <div class="er-canvas" id="canvas">
+            <svg id="lines"></svg>
+
+            <!-- Section Labels -->
+            <div class="section-label" style="top: 30px; left: 100px;">사용자 관리</div>
+            <div class="section-label" style="top: 30px; left: 800px;">팝업스토어</div>
+            <div class="section-label" style="top: 600px; left: 100px;">예약/결제</div>
+            <div class="section-label" style="top: 600px; left: 800px;">커뮤니티</div>
+            <div class="section-label" style="top: 1200px; left: 100px;">알림 시스템</div>
+            <div class="section-label" style="top: 1200px; left: 800px;">행위 로그</div>
+
+            <!-- ========== ENTITIES (사각형) ========== -->
+            
+            <!-- User -->
+            <div class="entity" id="user" style="top: 150px; left: 200px;">👤 User (사용자)</div>
+            
+            <!-- Profiles -->
+            <div class="entity" id="profiles" style="top: 300px; left: 100px;">📋 Profiles</div>
+            
+            <!-- Popups -->
+            <div class="entity" id="popups" style="top: 150px; left: 900px;">🏪 Popups (팝업스토어)</div>
+            
+            <!-- Comments -->
+            <div class="entity" id="comments" style="top: 750px; left: 900px;">💬 Comments (댓글)</div>
+            
+            <!-- Reservations -->
+            <div class="entity" id="reservations" style="top: 750px; left: 200px;">🎫 Reservations (예약)</div>
+            
+            <!-- Reports -->
+            <div class="entity" id="reports" style="top: 900px; left: 900px;">🚨 Reports (신고)</div>
+            
+            <!-- Edit Suggestions -->
+            <div class="entity" id="edit_suggestions" style="top: 1050px; left: 900px;">✏️ Edit Suggestions</div>
+            
+            <!-- Inquiries -->
+            <div class="entity" id="inquiries" style="top: 450px; left: 100px;">📩 Inquiries (문의)</div>
+            
+            <!-- Notifications -->
+            <div class="entity" id="notifications" style="top: 1350px; left: 200px;">🔔 Notifications</div>
+            
+            <!-- Refunds -->
+            <div class="entity" id="refunds" style="top: 900px; left: 200px;">💸 Refunds (환불)</div>
+
+            <!-- ========== NEW LOG TABLES ========== -->
+            
+            <!-- Popup Views -->
+            <div class="entity" id="popup_views" style="top: 1350px; left: 850px;">👁️ Popup Views</div>
+            
+            <!-- Search Logs -->
+            <div class="entity" id="search_logs" style="top: 1500px; left: 850px;">🔍 Search Logs</div>
+            
+            <!-- User Activities -->
+            <div class="entity" id="user_activities" style="top: 1650px; left: 850px;">📊 User Activities</div>
+            
+            <!-- Saved Routes -->
+            <div class="entity" id="saved_routes" style="top: 1500px; left: 200px;">🗺️ Saved Routes</div>
+
+            <!-- ========== RELATIONSHIPS (마름모) ========== -->
+            
+            <!-- 회원가입 -->
+            <div class="relationship" id="rel_signup" style="top: 200px; left: 50px;">
+                <div class="relationship-inner">
+                    <span class="relationship-text">회원가입</span>
+                </div>
+            </div>
+            
+            <!-- 팝업 찜하기 -->
+            <div class="relationship" id="rel_favorite" style="top: 100px; left: 500px;">
+                <div class="relationship-inner">
+                    <span class="relationship-text">찜하기</span>
+                </div>
+            </div>
+            
+            <!-- 팝업 조회 -->
+            <div class="relationship" id="rel_view" style="top: 300px; left: 700px;">
+                <div class="relationship-inner">
+                    <span class="relationship-text">조회</span>
+                </div>
+            </div>
+            
+            <!-- 댓글 작성 -->
+            <div class="relationship" id="rel_comment" style="top: 600px; left: 600px;">
+                <div class="relationship-inner">
+                    <span class="relationship-text">댓글 작성</span>
+                </div>
+            </div>
+            
+            <!-- 예약 신청 -->
+            <div class="relationship" id="rel_reserve" style="top: 600px; left: 400px;">
+                <div class="relationship-inner">
+                    <span class="relationship-text">예약 신청</span>
+                </div>
+            </div>
+            
+            <!-- 결제 완료 -->
+            <div class="relationship" id="rel_payment" style="top: 750px; left: 400px;">
+                <div class="relationship-inner">
+                    <span class="relationship-text">결제</span>
+                </div>
+            </div>
+            
+            <!-- 환불 요청 -->
+            <div class="relationship" id="rel_refund" style="top: 850px; left: 50px;">
+                <div class="relationship-inner">
+                    <span class="relationship-text">환불 요청</span>
+                </div>
+            </div>
+            
+            <!-- 신고하기 -->
+            <div class="relationship" id="rel_report" style="top: 820px; left: 700px;">
+                <div class="relationship-inner">
+                    <span class="relationship-text">신고하기</span>
+                </div>
+            </div>
+            
+            <!-- 수정 제안 -->
+            <div class="relationship" id="rel_edit" style="top: 970px; left: 700px;">
+                <div class="relationship-inner">
+                    <span class="relationship-text">수정 제안</span>
+                </div>
+            </div>
+            
+            <!-- 1:1 문의 -->
+            <div class="relationship" id="rel_inquiry" style="top: 400px; left: 280px;">
+                <div class="relationship-inner">
+                    <span class="relationship-text">1:1 문의</span>
+                </div>
+            </div>
+            
+            <!-- 알림 수신 -->
+            <div class="relationship" id="rel_notify" style="top: 1270px; left: 50px;">
+                <div class="relationship-inner">
+                    <span class="relationship-text">알림 수신</span>
+                </div>
+            </div>
+            
+            <!-- 검색 -->
+            <div class="relationship" id="rel_search" style="top: 1420px; left: 600px;">
+                <div class="relationship-inner">
+                    <span class="relationship-text">검색</span>
+                </div>
+            </div>
+            
+            <!-- 활동 기록 -->
+            <div class="relationship" id="rel_activity" style="top: 1570px; left: 600px;">
+                <div class="relationship-inner">
+                    <span class="relationship-text">활동 기록</span>
+                </div>
+            </div>
+            
+            <!-- 경로 저장 -->
+            <div class="relationship" id="rel_route" style="top: 1420px; left: 400px;">
+                <div class="relationship-inner">
+                    <span class="relationship-text">경로 저장</span>
+                </div>
+            </div>
+
+            <!-- ========== ATTRIBUTES (타원) ========== -->
+            
+            <!-- User Attributes -->
+            <div class="attribute primary" id="attr_user_id" style="top: 80px; left: 150px;">id (PK)</div>
+            <div class="attribute" id="attr_user_email" style="top: 80px; left: 280px;">email</div>
+            <div class="attribute" id="attr_user_role" style="top: 200px; left: 350px;">role</div>
+            
+            <!-- Profiles Attributes -->
+            <div class="attribute primary" id="attr_profile_id" style="top: 350px; left: 10px;">id (PK)</div>
+            <div class="attribute" id="attr_profile_nickname" style="top: 400px; left: 10px;">nickname</div>
+            <div class="attribute" id="attr_profile_favorites" style="top: 280px; left: 220px;">favorites[]</div>
+            <div class="attribute" id="attr_profile_notif" style="top: 350px; left: 220px;">is_notification_enabled</div>
+            
+            <!-- Popups Attributes -->
+            <div class="attribute primary" id="attr_popup_id" style="top: 80px; left: 850px;">id (PK)</div>
+            <div class="attribute" id="attr_popup_title" style="top: 80px; left: 1000px;">title</div>
+            <div class="attribute" id="attr_popup_location" style="top: 200px; left: 1080px;">location</div>
+            <div class="attribute" id="attr_popup_dates" style="top: 250px; left: 1000px;">start_date / end_date</div>
+            <div class="attribute" id="attr_popup_category" style="top: 200px; left: 800px;">category</div>
+            <div class="attribute" id="attr_popup_fee" style="top: 300px; left: 800px;">entry_fee</div>
+            
+            <!-- Comments Attributes -->
+            <div class="attribute primary" id="attr_comment_id" style="top: 700px; left: 850px;">id (PK)</div>
+            <div class="attribute" id="attr_comment_content" style="top: 700px; left: 1020px;">content</div>
+            <div class="attribute" id="attr_comment_created" style="top: 800px; left: 1060px;">created_at</div>
+            
+            <!-- Reservations Attributes -->
+            <div class="attribute primary" id="attr_res_id" style="top: 700px; left: 150px;">id (PK)</div>
+            <div class="attribute" id="attr_res_status" style="top: 700px; left: 320px;">status</div>
+            <div class="attribute" id="attr_res_payment" style="top: 800px; left: 350px;">payment_key</div>
+            <div class="attribute" id="attr_res_date" style="top: 800px; left: 100px;">reservation_date</div>
+            
+            <!-- Notifications Attributes -->
+            <div class="attribute primary" id="attr_notif_id" style="top: 1300px; left: 150px;">id (PK)</div>
+            <div class="attribute" id="attr_notif_type" style="top: 1300px; left: 320px;">type</div>
+            <div class="attribute" id="attr_notif_read" style="top: 1400px; left: 350px;">is_read</div>
+            <div class="attribute" id="attr_notif_msg" style="top: 1400px; left: 100px;">message</div>
+            
+            <!-- Refunds Attributes -->
+            <div class="attribute primary" id="attr_refund_id" style="top: 870px; left: 320px;">id (PK)</div>
+            <div class="attribute" id="attr_refund_amount" style="top: 950px; left: 320px;">amount</div>
+            <div class="attribute" id="attr_refund_reason" style="top: 950px; left: 100px;">reason</div>
+            <div class="attribute" id="attr_refund_status" style="top: 1000px; left: 220px;">status</div>
+            
+            <!-- Popup Views Attributes -->
+            <div class="attribute primary" id="attr_view_id" style="top: 1300px; left: 800px;">id (PK)</div>
+            <div class="attribute" id="attr_view_source" style="top: 1300px; left: 1000px;">source</div>
+            <div class="attribute" id="attr_view_device" style="top: 1400px; left: 1000px;">device_type</div>
+            
+            <!-- Search Logs Attributes -->
+            <div class="attribute primary" id="attr_search_id" style="top: 1470px; left: 1000px;">id (PK)</div>
+            <div class="attribute" id="attr_search_keyword" style="top: 1550px; left: 1000px;">keyword</div>
+            <div class="attribute" id="attr_search_filters" style="top: 1470px; left: 1100px;">filters</div>
+            
+            <!-- User Activities Attributes -->
+            <div class="attribute primary" id="attr_activity_id" style="top: 1620px; left: 1000px;">id (PK)</div>
+            <div class="attribute" id="attr_activity_type" style="top: 1700px; left: 1000px;">activity_type</div>
+            <div class="attribute" id="attr_activity_meta" style="top: 1620px; left: 1100px;">metadata</div>
+            
+            <!-- Saved Routes Attributes -->
+            <div class="attribute primary" id="attr_route_id" style="top: 1460px; left: 100px;">id (PK)</div>
+            <div class="attribute" id="attr_route_name" style="top: 1460px; left: 330px;">name</div>
+            <div class="attribute" id="attr_route_popups" style="top: 1550px; left: 100px;">popup_ids[]</div>
+            
+            <!-- Reports Attributes -->
+            <div class="attribute primary" id="attr_report_id" style="top: 870px; left: 1050px;">id (PK)</div>
+            <div class="attribute" id="attr_report_reason" style="top: 950px; left: 1020px;">reason</div>
+            
+            <!-- Edit Suggestions Attributes -->
+            <div class="attribute primary" id="attr_edit_id" style="top: 1020px; left: 1050px;">id (PK)</div>
+            <div class="attribute" id="attr_edit_content" style="top: 1100px; left: 1000px;">suggested_data</div>
+            
+            <!-- Inquiries Attributes -->
+            <div class="attribute primary" id="attr_inquiry_id" style="top: 420px; left: 10px;">id (PK)</div>
+            <div class="attribute" id="attr_inquiry_title" style="top: 500px; left: 10px;">title</div>
+            <div class="attribute" id="attr_inquiry_content" style="top: 500px; left: 150px;">content</div>
+
+        </div>
+    </div>
+
+    <div class="zoom-controls">
+        <button class="zoom-btn" id="zoomIn">+</button>
+        <button class="zoom-btn" id="zoomOut">−</button>
+        <button class="zoom-btn" id="zoomReset">⟲</button>
+    </div>
+
+    <script>
+        // Drag functionality
+        const canvas = document.getElementById('canvas');
+        let isDragging = false;
+        let currentElement = null;
+        let offsetX, offsetY;
+
+        // Make elements draggable
+        const draggables = document.querySelectorAll('.entity, .relationship, .attribute');
+        
+        draggables.forEach(el => {
+            el.addEventListener('mousedown', startDrag);
+        });
+
+        function startDrag(e) {
+            isDragging = true;
+            currentElement = e.target.closest('.entity, .relationship, .attribute');
+            currentElement.classList.add('dragging');
+            
+            const rect = currentElement.getBoundingClientRect();
+            const canvasRect = canvas.getBoundingClientRect();
+            
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
+            
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', stopDrag);
+        }
+
+        function drag(e) {
+            if (!isDragging || !currentElement) return;
+            
+            const canvasRect = canvas.getBoundingClientRect();
+            const containerRect = document.querySelector('.canvas-container').getBoundingClientRect();
+            const scrollLeft = document.querySelector('.canvas-container').scrollLeft;
+            const scrollTop = document.querySelector('.canvas-container').scrollTop;
+            
+            let x = e.clientX - containerRect.left + scrollLeft - offsetX;
+            let y = e.clientY - containerRect.top + scrollTop - offsetY;
+            
+            // Keep within bounds
+            x = Math.max(0, Math.min(x, canvas.offsetWidth - currentElement.offsetWidth));
+            y = Math.max(0, Math.min(y, canvas.offsetHeight - currentElement.offsetHeight));
+            
+            currentElement.style.left = x + 'px';
+            currentElement.style.top = y + 'px';
+            
+            drawLines();
+        }
+
+        function stopDrag() {
+            if (currentElement) {
+                currentElement.classList.remove('dragging');
+            }
+            isDragging = false;
+            currentElement = null;
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('mouseup', stopDrag);
+        }
+
+        // Draw connection lines
+        function drawLines() {
+            const svg = document.getElementById('lines');
+            svg.innerHTML = '';
+            
+            const connections = [
+                // User connections
+                ['user', 'rel_signup'],
+                ['rel_signup', 'profiles'],
+                ['user', 'rel_favorite'],
+                ['rel_favorite', 'popups'],
+                ['user', 'rel_view'],
+                ['rel_view', 'popups'],
+                
+                // Comment connections
+                ['user', 'rel_comment'],
+                ['rel_comment', 'comments'],
+                ['comments', 'popups'],
+                
+                // Reservation connections
+                ['user', 'rel_reserve'],
+                ['rel_reserve', 'reservations'],
+                ['reservations', 'popups'],
+                ['reservations', 'rel_payment'],
+                
+                // Refund connections
+                ['user', 'rel_refund'],
+                ['rel_refund', 'refunds'],
+                ['refunds', 'reservations'],
+                
+                // Report connections
+                ['user', 'rel_report'],
+                ['rel_report', 'reports'],
+                ['reports', 'popups'],
+                
+                // Edit suggestion connections
+                ['user', 'rel_edit'],
+                ['rel_edit', 'edit_suggestions'],
+                ['edit_suggestions', 'popups'],
+                
+                // Inquiry connections
+                ['user', 'rel_inquiry'],
+                ['rel_inquiry', 'inquiries'],
+                
+                // Notification connections
+                ['user', 'rel_notify'],
+                ['rel_notify', 'notifications'],
+                
+                // Popup views connections
+                ['user', 'popup_views'],
+                ['popup_views', 'popups'],
+                
+                // Search logs connections
+                ['user', 'rel_search'],
+                ['rel_search', 'search_logs'],
+                
+                // User activities connections
+                ['user', 'rel_activity'],
+                ['rel_activity', 'user_activities'],
+                
+                // Saved routes connections
+                ['user', 'rel_route'],
+                ['rel_route', 'saved_routes'],
+                ['saved_routes', 'popups'],
+                
+                // Attribute connections - User
+                ['user', 'attr_user_id'],
+                ['user', 'attr_user_email'],
+                ['user', 'attr_user_role'],
+                
+                // Attribute connections - Profiles
+                ['profiles', 'attr_profile_id'],
+                ['profiles', 'attr_profile_nickname'],
+                ['profiles', 'attr_profile_favorites'],
+                ['profiles', 'attr_profile_notif'],
+                
+                // Attribute connections - Popups
+                ['popups', 'attr_popup_id'],
+                ['popups', 'attr_popup_title'],
+                ['popups', 'attr_popup_location'],
+                ['popups', 'attr_popup_dates'],
+                ['popups', 'attr_popup_category'],
+                ['popups', 'attr_popup_fee'],
+                
+                // Attribute connections - Comments
+                ['comments', 'attr_comment_id'],
+                ['comments', 'attr_comment_content'],
+                ['comments', 'attr_comment_created'],
+                
+                // Attribute connections - Reservations
+                ['reservations', 'attr_res_id'],
+                ['reservations', 'attr_res_status'],
+                ['reservations', 'attr_res_payment'],
+                ['reservations', 'attr_res_date'],
+                
+                // Attribute connections - Notifications
+                ['notifications', 'attr_notif_id'],
+                ['notifications', 'attr_notif_type'],
+                ['notifications', 'attr_notif_read'],
+                ['notifications', 'attr_notif_msg'],
+                
+                // Attribute connections - Refunds
+                ['refunds', 'attr_refund_id'],
+                ['refunds', 'attr_refund_amount'],
+                ['refunds', 'attr_refund_reason'],
+                ['refunds', 'attr_refund_status'],
+                
+                // Attribute connections - Popup Views
+                ['popup_views', 'attr_view_id'],
+                ['popup_views', 'attr_view_source'],
+                ['popup_views', 'attr_view_device'],
+                
+                // Attribute connections - Search Logs
+                ['search_logs', 'attr_search_id'],
+                ['search_logs', 'attr_search_keyword'],
+                ['search_logs', 'attr_search_filters'],
+                
+                // Attribute connections - User Activities
+                ['user_activities', 'attr_activity_id'],
+                ['user_activities', 'attr_activity_type'],
+                ['user_activities', 'attr_activity_meta'],
+                
+                // Attribute connections - Saved Routes
+                ['saved_routes', 'attr_route_id'],
+                ['saved_routes', 'attr_route_name'],
+                ['saved_routes', 'attr_route_popups'],
+                
+                // Attribute connections - Reports
+                ['reports', 'attr_report_id'],
+                ['reports', 'attr_report_reason'],
+                
+                // Attribute connections - Edit Suggestions
+                ['edit_suggestions', 'attr_edit_id'],
+                ['edit_suggestions', 'attr_edit_content'],
+                
+                // Attribute connections - Inquiries
+                ['inquiries', 'attr_inquiry_id'],
+                ['inquiries', 'attr_inquiry_title'],
+                ['inquiries', 'attr_inquiry_content'],
+            ];
+            
+            connections.forEach(([id1, id2]) => {
+                const el1 = document.getElementById(id1);
+                const el2 = document.getElementById(id2);
+                
+                if (el1 && el2) {
+                    const rect1 = el1.getBoundingClientRect();
+                    const rect2 = el2.getBoundingClientRect();
+                    const canvasRect = canvas.getBoundingClientRect();
+                    const containerRect = document.querySelector('.canvas-container').getBoundingClientRect();
+                    const scrollLeft = document.querySelector('.canvas-container').scrollLeft;
+                    const scrollTop = document.querySelector('.canvas-container').scrollTop;
+                    
+                    const x1 = rect1.left - containerRect.left + scrollLeft + rect1.width / 2;
+                    const y1 = rect1.top - containerRect.top + scrollTop + rect1.height / 2;
+                    const x2 = rect2.left - containerRect.left + scrollLeft + rect2.width / 2;
+                    const y2 = rect2.top - containerRect.top + scrollTop + rect2.height / 2;
+                    
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', x1);
+                    line.setAttribute('y1', y1);
+                    line.setAttribute('x2', x2);
+                    line.setAttribute('y2', y2);
+                    svg.appendChild(line);
+                }
+            });
+        }
+
+        // Zoom functionality
+        let scale = 1;
+        const zoomIn = document.getElementById('zoomIn');
+        const zoomOut = document.getElementById('zoomOut');
+        const zoomReset = document.getElementById('zoomReset');
+
+        zoomIn.addEventListener('click', () => {
+            scale = Math.min(scale + 0.1, 2);
+            canvas.style.transform = `scale(${scale})`;
+            canvas.style.transformOrigin = 'top left';
+        });
+
+        zoomOut.addEventListener('click', () => {
+            scale = Math.max(scale - 0.1, 0.5);
+            canvas.style.transform = `scale(${scale})`;
+            canvas.style.transformOrigin = 'top left';
+        });
+
+        zoomReset.addEventListener('click', () => {
+            scale = 1;
+            canvas.style.transform = `scale(${scale})`;
+        });
+
+        // Initial draw
+        setTimeout(drawLines, 100);
+        window.addEventListener('resize', drawLines);
+    </script>
+</body>
+</html>
